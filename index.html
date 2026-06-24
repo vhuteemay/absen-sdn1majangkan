@@ -144,16 +144,14 @@
 
 <script>
     // --- 1. CONFIGURATION (PENGATURAN UTAMA) ---
-    // Ganti dengan Link Google Spreadsheet Admin Anda
-    const LINK_GOOGLE_SPREADSHEET = "https://docs.google.com/spreadsheets/d/1epZXx1snxRIZ2fs5sQe4LLgYJbHdlnESYm5e2OknVls/edit"; 
+    const LINK_GOOGLE_SPREADSHEET = "https://docs.google.com/spreadsheets/d/1epZXx1snxRIZ2fs5sQe4LLgYJbHdlnESYm5e2OknVls/edit?usp=drive_link"; 
 
-    // Koordinat SDN 1 Majangkan (Contoh, silakan sesuaikan dengan titik tengah sekolah Anda)
+    // Koordinat SDN 1 Majangkan
     const SEKOLAH_LAT = -1.279941; 
     const SEKOLAH_LON = 115.075841;
-    const RADIUS_MAKSIMAL_METER = 50; // Jarak maksimal PTK ke sekolah (toleransi jangkauan)
+    const RADIUS_MAKSIMAL_METER = 50; 
 
-    // Simulasi database guru (NIP sebagai Username, NI sebagai Password)
-    // Silakan tambahkan daftar guru sesuai kebutuhan di sini
+    // Database guru (NIP sebagai Username, NI sebagai Password)
     const dataGuru = {
         "197903202006041017": { nama: "Ade Irawan, S.Pd.", ni: "NI1017" },
         "198604232024212004": { nama: "Bayah, S.Pd.I", ni: "NI2004" },
@@ -163,14 +161,14 @@
         "198303082010012025": { nama: "Mira Susila, S.Pd.Gr.", ni: "NI2025" },
         "198603312009032008": { nama: "Oka Rasetha, S.Pd.", ni: "NI2008" },
         "199006292025211115": { nama: "Poetra Anjas Palitta.", ni: "NI1115" },
-        "198011282022211003": { nama: "Ramaiyana", ni: "NI1003" },
+        "197305072025212033": { nama: "Ramaiyana", ni: "NI2033" },
         "198011282022211003": { nama: "Silvanus, S.Pd.Gr.", ni: "NI1003" },
         "196607031986082002": { nama: "Samiyati, S.Pd.", ni: "NI2002" },
         "197809092007012017": { nama: "Siti Wahidah, S.Pd.Gr.", ni: "NI2017" },
-        "197606042006042023": { nama: "Syamsinah, S.Pd.", ni: "NI12023" },
+        "197606042006042023": { nama: "Syamsinah, S.Pd.", ni: "NI12023" }
     };
 
-    let ptkLogin aktif = null;
+    let ptkLoginAktif = null;
 
     // --- 2. SISTEM JAM REALTIME ---
     setInterval(() => {
@@ -207,8 +205,7 @@
     }
 
     function bukaKinerja() {
-        // Mengarahkan langsung ke Google Spreadsheet milik admin
-        window.open(https://docs.google.com/spreadsheets/d/1epZXx1snxRIZ2fs5sQe4LLgYJbHdlnESYm5e2OknVls/edit?usp=drive_link, '_blank');
+        window.open(LINK_GOOGLE_SPREADSHEET, '_blank');
     }
 
     function kembaliKeDashboard() {
@@ -239,15 +236,12 @@
                     const userLat = position.coords.latitude;
                     const userLon = position.coords.longitude;
                     
-                    // Hitung jarak antara guru dan sekolah
                     const jarak = hitungJarak(userLat, userLon, SEKOLAH_LAT, SEKOLAH_LON);
 
                     if (jarak <= RADIUS_MAKSIMAL_METER) {
                         statusDiv.style.backgroundColor = "#2ecc71";
                         statusDiv.style.color = "white";
                         statusDiv.innerText = `Absen ${tipe} BERHASIL!\nAnda berada di area sekolah (${Math.round(jarak)}m).`;
-                        
-                        // DI SINI: Tempat untuk menambahkan pengiriman data otomatis ke Google Sheets via Web Apps script jika diperlukan.
                         console.log(`Data Dikirim: ${ptkLoginAktif.nama} - ${tipe} pada koordinat ${userLat}, ${userLon}`);
                     } else {
                         statusDiv.style.backgroundColor = "#e74c3c";
@@ -267,9 +261,8 @@
         }
     }
 
-    // Rumus Haversine untuk menghitung jarak koordinat bumi (hasil dalam satuan Meter)
     function hitungJarak(lat1, lon1, lat2, lon2) {
-        const R = 6371e3; // jari-jari bumi dalam meter
+        const R = 6371e3; 
         const phi1 = lat1 * Math.PI/180;
         const phi2 = lat2 * Math.PI/180;
         const deltaPhi = (lat2-lat1) * Math.PI/180;
