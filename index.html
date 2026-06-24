@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi SDN 1 Majangkan</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --bg-color: #f5f7fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        h2 { color: var(--primary-color); margin-bottom: 5px; }
+        h4 { color: #7f8c8d; margin-top: 0; margin-bottom: 25px; }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #34495e; }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary { background-color: var(--secondary-color); color: white; }
+        .btn-primary:hover { background-color: #2980b9; }
+        .btn-success { background-color: var(--success-color); color: white; }
+        .btn-success:hover { background-color: #27ae60; }
+        .btn-danger { background-color: var(--danger-color); color: white; }
+        .btn-danger:hover { background-color: #c0392b; }
+
+        .hidden { display: none; }
+        
+        .menu-box {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        #clock {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 15px 0;
+            background: #edf2f7;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .status-msg {
+            font-weight: bold;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>SDN 1 MAJANGKAN</h2>
+    
+    <div id="page-login">
+        <h4>Sistem Absensi & Kinerja</h4>
+        <div class="form-group">
+            <label>Username (NIP)</label>
+            <input type="text" id="username" placeholder="Masukkan NIP">
+        </div>
+        <div class="form-group">
+            <label>Password (NI)</label>
+            <input type="password" id="password" placeholder="Masukkan NI">
+        </div>
+        <button class="btn-primary" onclick="prosesLogin()">Masuk</button>
+        <p id="login-error" style="color: red; font-size: 14px;" class="hidden">NIP atau NI salah!</p>
+    </div>
+
+    <div id="page-dashboard" class="hidden">
+        <h4 id="welcome-msg">Selamat Datang</h4>
+        <div class="menu-box">
+            <button class="btn-primary" onclick="bukaAbsen()">ABSEN</button>
+            <button class="btn-primary" style="background-color: #9b59b6;" onclick="bukaKinerja()">KINERJA</button>
+        </div>
+        <button class="btn-danger" style="margin-top: 20px; font-size: 14px; padding: 8px;" onclick="logout()">Keluar</button>
+    </div>
+
+    <div id="page-absen" class="hidden">
+        <h4>Form Absensi Presensi</h4>
+        <div style="text-align: left; margin-bottom: 15px;">
+            <p><strong>Nama PTK:</strong> <span id="ptk-name">-</span></p>
+            <p><strong>NIP:</strong> <span id="ptk-nip">-</span></p>
+        </div>
+        
+        <div id="clock">00:00:00</div>
+        
+        <button class="btn-success" onclick="lakukanAbsen('Masuk')">Check In (Masuk)</button>
+        <button class="btn-danger" onclick="lakukanAbsen('Pulang')">Check Out (Pulang)</button>
+        <button class="btn-primary" style="background-color: #7f8c8d; margin-top: 10px;" onclick="kembaliKeDashboard()">Kembali</button>
+        
+        <div id="status-lokasi" class="status-msg hidden"></div>
+    </div>
+</div>
+
+<script>
+    // --- 1. CONFIGURATION (PENGATURAN UTAMA) ---
+    // Ganti dengan Link Google Spreadsheet Admin Anda
+    const LINK_GOOGLE_SPREADSHEET = "https://docs.google.com/spreadsheets/d/1epZXx1snxRIZ2fs5sQe4LLgYJbHdlnESYm5e2OknVls/edit"; 
+
+    // Koordinat SDN 1 Majangkan (Contoh, silakan sesuaikan dengan titik tengah sekolah Anda)
+    const SEKOLAH_LAT = -1.279941; 
+    const SEKOLAH_LON = 115.075841;
+    const RADIUS_MAKSIMAL_METER = 50; // Jarak maksimal PTK ke sekolah (toleransi jangkauan)
+
+    // Simulasi database guru (NIP sebagai Username, NI sebagai Password)
+    // Silakan tambahkan daftar guru sesuai kebutuhan di sini
+    const dataGuru = {
+        "197903202006041017": { nama: "Ade Irawan, S.Pd.", ni: "NI1017" },
+        "198604232024212004": { nama: "Bayah, S.Pd.I", ni: "NI2004" },
+        "199610232025211030": { nama: "Bobby Santosa, S.Th.", ni: "NI1030" },
+        "198106112005012012": { nama: "Helmi Tania, S.Pd.", ni: "NI2012" },
+        "198307152025212068": { nama: "Juminari", ni: "NI2058" },
+        "198303082010012025": { nama: "Mira Susila, S.Pd.Gr.", ni: "NI2025" },
+        "198603312009032008": { nama: "Oka Rasetha, S.Pd.", ni: "NI2008" },
+        "199006292025211115": { nama: "Poetra Anjas Palitta.", ni: "NI1115" },
+        "198011282022211003": { nama: "Ramaiyana", ni: "NI1003" },
+        "198011282022211003": { nama: "Silvanus, S.Pd.Gr.", ni: "NI1003" },
+        "196607031986082002": { nama: "Samiyati, S.Pd.", ni: "NI2002" },
+        "197809092007012017": { nama: "Siti Wahidah, S.Pd.Gr.", ni: "NI2017" },
+        "197606042006042023": { nama: "Syamsinah, S.Pd.", ni: "NI12023" },
+    };
+
+    let ptkLogin aktif = null;
+
+    // --- 2. SISTEM JAM REALTIME ---
+    setInterval(() => {
+        const sekarang = new Date();
+        const jam = String(sekarang.getHours()).padStart(2, '0');
+        const menit = String(sekarang.getMinutes()).padStart(2, '0');
+        const detik = String(sekarang.getSeconds()).padStart(2, '0');
+        document.getElementById('clock').innerText = `${jam}:${menit}:${detik}`;
+    }, 1000);
+
+    // --- 3. NAVIGASI & LOGIKA APLIKASI ---
+    function prosesLogin() {
+        const nip = document.getElementById('username').value;
+        const ni = document.getElementById('password').value;
+
+        if (dataGuru[nip] && dataGuru[nip].ni === ni) {
+            ptkLoginAktif = { nip: nip, nama: dataGuru[nip].nama };
+            document.getElementById('login-error').classList.add('hidden');
+            
+            // Masuk Halaman 2
+            document.getElementById('page-login').classList.add('hidden');
+            document.getElementById('page-dashboard').classList.remove('hidden');
+            document.getElementById('welcome-msg').innerText = `Selamat Datang,\n${ptkLoginAktif.nama}`;
+        } else {
+            document.getElementById('login-error').classList.remove('hidden');
+        }
+    }
+
+    function bukaAbsen() {
+        document.getElementById('page-dashboard').classList.add('hidden');
+        document.getElementById('page-absen').classList.remove('hidden');
+        document.getElementById('ptk-name').innerText = ptkLoginAktif.nama;
+        document.getElementById('ptk-nip').innerText = ptkLoginAktif.nip;
+    }
+
+    function bukaKinerja() {
+        // Mengarahkan langsung ke Google Spreadsheet milik admin
+        window.open(https://docs.google.com/spreadsheets/d/1epZXx1snxRIZ2fs5sQe4LLgYJbHdlnESYm5e2OknVls/edit?usp=drive_link, '_blank');
+    }
+
+    function kembaliKeDashboard() {
+        document.getElementById('page-absen').classList.add('hidden');
+        document.getElementById('page-dashboard').classList.remove('hidden');
+        document.getElementById('status-lokasi').classList.add('hidden');
+    }
+
+    function logout() {
+        ptkLoginAktif = null;
+        document.getElementById('username').value = "";
+        document.getElementById('password').value = "";
+        document.getElementById('page-dashboard').classList.add('hidden');
+        document.getElementById('page-login').classList.remove('hidden');
+    }
+
+    // --- 4. VALIDASI GEOLOCATION (LOKASI) ---
+    function lakukanAbsen(tipe) {
+        const statusDiv = document.getElementById('status-lokasi');
+        statusDiv.classList.remove('hidden');
+        statusDiv.style.backgroundColor = "#f1c40f";
+        statusDiv.style.color = "black";
+        statusDiv.innerText = "Sedang mengunci lokasi Anda...";
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const userLat = position.coords.latitude;
+                    const userLon = position.coords.longitude;
+                    
+                    // Hitung jarak antara guru dan sekolah
+                    const jarak = hitungJarak(userLat, userLon, SEKOLAH_LAT, SEKOLAH_LON);
+
+                    if (jarak <= RADIUS_MAKSIMAL_METER) {
+                        statusDiv.style.backgroundColor = "#2ecc71";
+                        statusDiv.style.color = "white";
+                        statusDiv.innerText = `Absen ${tipe} BERHASIL!\nAnda berada di area sekolah (${Math.round(jarak)}m).`;
+                        
+                        // DI SINI: Tempat untuk menambahkan pengiriman data otomatis ke Google Sheets via Web Apps script jika diperlukan.
+                        console.log(`Data Dikirim: ${ptkLoginAktif.nama} - ${tipe} pada koordinat ${userLat}, ${userLon}`);
+                    } else {
+                        statusDiv.style.backgroundColor = "#e74c3c";
+                        statusDiv.style.color = "white";
+                        statusDiv.innerText = `Absen GAGAL!\nAnda berada di luar jangkauan sekolah (${Math.round(jarak)}m dari sekolah).`;
+                    }
+                },
+                (error) => {
+                    statusDiv.style.backgroundColor = "#e74c3c";
+                    statusDiv.style.color = "white";
+                    statusDiv.innerText = "Gagal memuat lokasi. Pastikan GPS/Izin Lokasi HP Anda aktif.";
+                },
+                { enableHighAccuracy: true }
+            );
+        } else {
+            statusDiv.innerText = "Browser/HP Anda tidak mendukung fitur lokasi.";
+        }
+    }
+
+    // Rumus Haversine untuk menghitung jarak koordinat bumi (hasil dalam satuan Meter)
+    function hitungJarak(lat1, lon1, lat2, lon2) {
+        const R = 6371e3; // jari-jari bumi dalam meter
+        const phi1 = lat1 * Math.PI/180;
+        const phi2 = lat2 * Math.PI/180;
+        const deltaPhi = (lat2-lat1) * Math.PI/180;
+        const deltaLambda = (lon2-lon1) * Math.PI/180;
+
+        const a = Math.sin(deltaPhi/2) * Math.sin(deltaPhi/2) +
+                  Math.cos(phi1) * Math.cos(phi2) *
+                  Math.sin(deltaLambda/2) * Math.sin(deltaLambda/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+        return R * c; 
+    }
+</script>
+
+</body>
+</html>
