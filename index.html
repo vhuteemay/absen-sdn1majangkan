@@ -144,28 +144,78 @@
 
 <script>
     // --- 1. CONFIGURATION (PENGATURAN UTAMA) ---
-    const LINK_GOOGLE_SPREADSHEET = "https://docs.google.com/spreadsheets/d/1epZXx1snxRIZ2fs5sQe4LLgYJbHdlnESYm5e2OknVls/edit?usp=drive_link"; 
-
     // Koordinat SDN 1 Majangkan
     const SEKOLAH_LAT = -1.279941; 
     const SEKOLAH_LON = 115.075841;
     const RADIUS_MAKSIMAL_METER = 50; 
 
-    // Database guru (NIP sebagai Username, NI sebagai Password)
+    // Database guru (Silakan ganti teks URL dengan link file spreadsheet masing-masing guru)
     const dataGuru = {
-        "197903202006041017": { nama: "Ade Irawan, S.Pd.", ni: "NI1017" },
-        "198604232024212004": { nama: "Bayah, S.Pd.I", ni: "NI2004" },
-        "199610232025211030": { nama: "Bobby Santosa, S.Th.", ni: "NI1030" },
-        "198106112005012012": { nama: "Helmi Tania, S.Pd.", ni: "NI2012" },
-        "198307152025212068": { nama: "Juminari", ni: "NI2058" },
-        "198303082010012025": { nama: "Mira Susila, S.Pd.Gr.", ni: "NI2025" },
-        "198603312009032008": { nama: "Oka Rasetha, S.Pd.", ni: "NI2008" },
-        "199006292025211115": { nama: "Poetra Anjas Palitta.", ni: "NI1115" },
-        "197305072025212033": { nama: "Ramaiyana", ni: "NI2033" },
-        "198011282022211003": { nama: "Silvanus, S.Pd.Gr.", ni: "NI1003" },
-        "196607031986082002": { nama: "Samiyati, S.Pd.", ni: "NI2002" },
-        "197809092007012017": { nama: "Siti Wahidah, S.Pd.Gr.", ni: "NI2017" },
-        "197606042006042023": { nama: "Syamsinah, S.Pd.", ni: "NI12023" }
+        "197903202006041017": { 
+            nama: "Ade Irawan, S.Pd.", 
+            ni: "NI1017",
+            linkKinerja: "https://docs.google.com/spreadsheets/d/1l_eyLF8gHgaJfXn4e4YKv_dh6RNxudzpHgoseDwVq2Y/edit?usp=sharing" 
+        },
+        "198604232024212004": { 
+            nama: "Bayah, S.Pd.I", 
+            ni: "NI2004",
+            linkKinerja: "https://docs.google.com/spreadsheets/d/1rk-STKtjCIYoP7jmK8Pmph0310oWqO5C4cQOyVYNKw4/edit?usp=sharing"
+        },
+        "199610232025211030": { 
+            nama: "Bobby Santosa, S.Th.", 
+            ni: "NI1030",
+            linkKinerja: "https://docs.google.com/spreadsheets/d/1yONTEulI5m4yDBMzNtjIrG4xx4S3EPouJrhLwrogrYk/edit?usp=sharing"
+        },
+        "198106112005012012": { 
+            nama: "Helmi Tania, S.Pd.", 
+            ni: "NI2012",
+            linkKinerja: "https://docs.google.com/spreadsheets/d/1Zwcy1Cf2t26p2qOvHxe6yezGKGFHaDPllYUSKfgDoSU/edit?usp=sharing"
+        },
+        "198307152025212068": { 
+            nama: "Juminari", 
+            ni: "NI2058",
+            linkKinerja: "https://docs.google.com/spreadsheets/d/LINK_FILE_JUMINARI"
+        },
+        "198303082010012025": { 
+            nama: "Mira Susila, S.Pd.Gr.", 
+            ni: "NI2025",
+            linkKinerja: "https://docs.google.com/spreadsheets/d/11besWfdjiALlWUS7rfSP5sQxa7WT6cY9m652GRPSfY8/edit?usp=sharing"
+        },
+        "198603312009032008": { 
+            nama: "Oka Rasetha, S.Pd.", 
+            ni: "NI2008",
+            linkKinerja: "https://docs.google.com/spreadsheets/d/19Lpj6yrtK3viUhdrZHigMqqekTi4FloTqw4jD6-bmpg/edit?usp=sharing"
+        },
+        "199006292025211115": { 
+            nama: "Poetra Anjas Palitta.", 
+            ni: "NI1115",
+            linkKinerja: "https://docs.google.com/spreadsheets/d/LINK_FILE_PAK_PUTRA"
+        },
+        "198011282022211003": { 
+            nama: "Ramaiyana", 
+            ni: "NI1003",
+            linkKinerja: "https://docs.google.com/spreadsheets/d/LINK_FILE_RAMAIYANA"
+        },
+        "198011282022211004": { 
+            nama: "Silvanus, S.Pd.Gr.", 
+            ni: "NI1003",
+            linkKinerja: "https://docs.google.com/spreadsheets/d/1akFFc0OfHuH654riz5Y-tsfbdxkcqQoe844RQ391_jM/edit?usp=sharing"
+        },
+        "196607031986082002": { 
+            nama: "Samiyati, S.Pd.", 
+            ni: "NI2002",
+            linkKinerja: "https://docs.google.com/spreadsheets/d/LINK_FILE_BU_SAMIYATI"
+        },
+        "197809092007012017": { 
+            nama: "Siti Wahidah, S.Pd.Gr.", 
+            ni: "NI2017",
+            linkKinerja: "https://docs.google.com/spreadsheets/d/1Q_bbM_8XZlvWvKpZoK-9eSzZHsc3EKyhG033zKG-Mr4/edit?usp=sharing"
+        },
+        "197606042006042023": { 
+            nama: "Syamsinah, S.Pd.", 
+            ni: "NI12023",
+            linkKinerja: "https://docs.google.com/spreadsheets/d/19gcxfxHy1bCDTT61EbvR44JFJGvWuhhWlD5om1R5IxA/edit?usp=sharing"
+        }
     };
 
     let ptkLoginAktif = null;
@@ -185,10 +235,15 @@
         const ni = document.getElementById('password').value;
 
         if (dataGuru[nip] && dataGuru[nip].ni === ni) {
-            ptkLoginAktif = { nip: nip, nama: dataGuru[nip].nama };
+            // Menyimpan info guru dan link kinerja pribadinya
+            ptkLoginAktif = { 
+                nip: nip, 
+                nama: dataGuru[nip].nama,
+                linkKinerja: dataGuru[nip].linkKinerja
+            };
             document.getElementById('login-error').classList.add('hidden');
             
-            // Masuk Halaman 2
+            // Masuk Halaman Dashboard
             document.getElementById('page-login').classList.add('hidden');
             document.getElementById('page-dashboard').classList.remove('hidden');
             document.getElementById('welcome-msg').innerText = `Selamat Datang,\n${ptkLoginAktif.nama}`;
@@ -205,7 +260,12 @@
     }
 
     function bukaKinerja() {
-        window.open(LINK_GOOGLE_SPREADSHEET, '_blank');
+        // Otomatis membuka link spreadsheet khusus milik guru yang sedang login
+        if (ptkLoginAktif && ptkLoginAktif.linkKinerja) {
+            window.open(ptkLoginAktif.linkKinerja, '_blank');
+        } else {
+            alert("Maaf, link aplikasi kinerja Anda belum dikonfigurasi oleh Admin.");
+        }
     }
 
     function kembaliKeDashboard() {
